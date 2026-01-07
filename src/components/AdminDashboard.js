@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, doc, setDoc, getDocs, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, onSnapshot, query, orderBy, deleteDoc } from 'firebase/firestore';
 
 function AdminDashboard() {
   const [sessionActive, setSessionActive] = useState(false);
@@ -86,8 +86,8 @@ function AdminDashboard() {
       // Delete all users
       const usersSnapshot = await getDocs(collection(db, 'users'));
       const deletePromises = [];
-      usersSnapshot.forEach((doc) => {
-        deletePromises.push(doc.ref.delete());
+      usersSnapshot.forEach((userDoc) => {
+        deletePromises.push(deleteDoc(userDoc.ref));
       });
       await Promise.all(deletePromises);
 
