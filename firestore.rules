@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Questions collection - read-only for all users
+    match /questions/{questionId} {
+      allow read: if true;
+      allow write: if false; // Only upload via admin script
+    }
+    
+    // Users collection - users can create and read their own data
+    match /users/{userId} {
+      allow read: if true; // Admin needs to read all users
+      allow create: if true; // Anyone can create a user entry
+      allow update: if true; // Allow updates for submitting answers
+      allow delete: if false; // Prevent deletion
+    }
+    
+    // Session collection - controls test start/stop
+    match /session/{sessionId} {
+      allow read: if true; // Everyone needs to know if test is active
+      allow write: if true; // TODO: Restrict to admin only with authentication
+    }
+  }
+}
