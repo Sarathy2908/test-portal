@@ -3,6 +3,9 @@ import { db } from '../firebase';
 import { collection, doc, setDoc, getDocs, onSnapshot, query, orderBy, deleteDoc } from 'firebase/firestore';
 
 function AdminDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   const [sessionActive, setSessionActive] = useState(false);
   const [users, setUsers] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -76,6 +79,17 @@ function AdminDashboard() {
     setLoading(false);
   };
 
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (password === 'sushmidha') {
+      setIsAuthenticated(true);
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+      setPassword('');
+    }
+  };
+
   const handleNewSession = async () => {
     if (!window.confirm('This will clear all user data and start a new session. Continue?')) {
       return;
@@ -110,6 +124,41 @@ function AdminDashboard() {
   const averageScore = completedUsers.length > 0
     ? (completedUsers.reduce((sum, u) => sum + (u.score || 0), 0) / completedUsers.length).toFixed(1)
     : 0;
+
+  // Show password screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="app-container">
+        <div className="card">
+          <div className="header">
+            <h1>🔐 Admin Access</h1>
+            <p>Enter password to continue</p>
+          </div>
+          <form onSubmit={handlePasswordSubmit}>
+            <div className="input-group">
+              <label>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter admin password"
+                required
+                autoFocus
+              />
+            </div>
+            {passwordError && (
+              <div className="error-message" style={{ marginBottom: '15px' }}>
+                ❌ Incorrect password. Please try again.
+              </div>
+            )}
+            <button type="submit" className="btn btn-primary">
+              Access Dashboard
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
